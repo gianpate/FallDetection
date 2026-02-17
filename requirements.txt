@@ -66,4 +66,4 @@ jpeg4py
 #git+https://github.com/jamesbowman/openexrpython.git
 wandb
 ipdb
-torch
+torch==1.13.1
