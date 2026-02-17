@@ -438,7 +438,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--save', help='Save .json / visualization output', action=argparse.BooleanOptionalAction)
 
-    parser.add_argument('--input', type=str, default='/dev/video0',
+    parser.add_argument('--input', type=str, default='./input',
                         help='From Device (path to files, videos , /dev/videoX or screen )')
 
     parser.add_argument('--cfg', type=str, default='configs/dpose_conf.yaml',
