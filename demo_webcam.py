@@ -305,8 +305,8 @@ def main(args):
     input_image_folder = args.image_folder
     # output_path        = args.output_folder
     #os.makedirs(output_path, exist_ok=True)
-    output_path = args.output_folder or "results"
-    os.makedirs(output_path, exist_ok=True)
+    output_path = "results"
+    # os.makedirs(output_path, exist_ok=True)
 
     logger.add(
         os.path.join(output_path, 'demo.log'),
@@ -347,7 +347,7 @@ def main(args):
             while True:
                 frameNumber+=1
                 sample_dir = os.path.join(output_path, f"sample_{frameNumber:05d}")
-                os.makedirs(sample_dir, exist_ok=True)
+                # os.makedirs(sample_dir, exist_ok=True)
                 if True:#frameNumber%2==0:
                     try:
                       ret, frame = cap.read()          
@@ -386,8 +386,8 @@ def main(args):
                     detection = mot.prepare_output_detections(detections)
                     if len(detection[0]) > 0:
 
-                        
                         # if (args.save):
+                        os.makedirs(sample_dir, exist_ok=True)
                         saveFilename = os.path.join(sample_dir,'colorFrame.jpg')
 
                         hmr_output=tester.run_on_single_image_tensor(frame, detection, save=saveFilename)
@@ -422,9 +422,9 @@ def main(args):
 
     saveCSVFileFromListOfDictsFollowingSkeletonOrder("3DPointsAzureKinect.csv",history,get_azure_kinect_skeleton())
   
-    input_path = args.input_path
-    csv_path = input_path + "_3DBody.csv"
-    saveCSVFileFromListOfDicts(csv_path,history)
+    # input_path = args.input
+    # csv_path = input_path + "_3DBody.csv"
+    # saveCSVFileFromListOfDicts(csv_path,history)
     if (args.save):
         os.system("ffmpeg -nostdin -framerate %u -start_number 1 -i colorFrame_0_%%05d.jpg -s %ux%u  -y -r %u -pix_fmt yuv420p -threads 8 livelastRun3DHiRes.mp4 && rm colorFrame_0_*.jpg " % (videoFramerate,videoWidth,videoHeight,videoFramerate)) # 
     del tester.model
