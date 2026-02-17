@@ -303,8 +303,10 @@ def rotate_frame_90(frame, clockwise=True):
 def main(args):
 
     input_image_folder = args.image_folder
-    output_path        = args.output_folder
+    # output_path        = args.output_folder
     #os.makedirs(output_path, exist_ok=True)
+    output_path = args.output_folder or "results"
+    os.makedirs(output_path, exist_ok=True)
 
     logger.add(
         os.path.join(output_path, 'demo.log'),
@@ -344,6 +346,8 @@ def main(args):
             use_bbox_filter = False
             while True:
                 frameNumber+=1
+                sample_dir = os.path.join(output_path, f"sample_{frameNumber:05d}")
+                os.makedirs(sample_dir, exist_ok=True)
                 if True:#frameNumber%2==0:
                     try:
                       ret, frame = cap.read()          
@@ -382,9 +386,9 @@ def main(args):
                     detection = mot.prepare_output_detections(detections)
                     if len(detection[0]) > 0:
 
-                        saveFilename = None
-                        if (args.save):
-                           saveFilename = 'colorFrame_0_%05d.jpg' % frameNumber
+                        
+                        # if (args.save):
+                        saveFilename = os.path.join(sample_dir,'colorFrame.jpg')
 
                         hmr_output=tester.run_on_single_image_tensor(frame, detection, save=saveFilename)
                         #---------------------------------------------------------------------------------------
@@ -397,19 +401,20 @@ def main(args):
                         history.append(pose3DAsDictionary)
  
                         #We can dump the skeleton to disk as skeleton_00000.json etc.
-                        if (args.save):
-                           save_skeleton_dict_to_json(pose3DAsDictionary,output_filename="skeleton_%05u.json" % frameNumber)
-                           del hmr_output['vertices'] # <- Remove this because it is really big
-                           save_raw_dict_to_json(hmr_output,output_filename="raw_%05u.json" % frameNumber)
+                      
+                        # if (args.save):
+                        save_skeleton_dict_to_json(pose3DAsDictionary,output_filename=os.path.join(sample_dir,"skeleton.json"))
+                        del hmr_output['vertices'] # <- Remove this because it is really big
+                        save_raw_dict_to_json(hmr_output,output_filename=os.path.join(sample_dir,"raw.json"))
 
                         #Uncomment to also do a matlab visualization
                         #save_matlab_visualization(hmr_output,output_filename="skeleton_%05u.png" % frameNumber)
                     else:
                         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                         cv2.imshow('front', frame)
-                        if (args.save):
-                           saveFilename = 'colorFrame_0_%05d.jpg' % frameNumber
-                           cv2.imwrite(saveFilename, frame)
+                        # if (args.save):
+                        saveFilename = os.path.join(sample_dir,'colorFrame.jpg')
+                        cv2.imwrite(saveFilename, frame)
                         
 
                     if cv2.waitKey(1) & 0xFF == ord('q'):
