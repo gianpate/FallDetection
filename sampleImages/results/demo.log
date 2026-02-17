@@ -1,0 +1,8 @@
+2025-11-14 16:00:55.055 | INFO     | __main__:main:269 - Demo options: 
+ Namespace(save=True, input='fallsamples/', cfg='configs/dpose_conf.yaml', ckpt='data/ckpt/paper_arxiv.ckpt', image_folder='demo_images', output_folder='fallsamples/results', tracker_batch_size=1, display=False, detector='yolo', yolo_img_size=416, eval_dataset=None, dataframe_path='data/ssp_3d_test.npz', data_split='test')
+2025-11-14 16:00:56.165 | INFO     | train.models.backbone.hrnet:init_weights:499 - => init weights from normal distribution
+2025-11-14 16:00:58.674 | INFO     | train.models.backbone.hrnet:init_weights:517 - => loading pretrained model data/ckpt/pretrained/pose_hrnet_w48_256x192.pth
+2025-11-14 16:01:02.663 | INFO     | train.core.tester:_load_pretrained_model:49 - Loading pretrained model from data/ckpt/paper_arxiv.ckpt
+2025-11-14 16:01:05.690 | WARNING  | train.utils.train_utils:load_pretrained_model:29 - Removing "model." keyword from state_dict keys..
+2025-11-14 16:01:05.902 | INFO     | train.core.tester:_load_pretrained_model:52 - Loaded pretrained weights from "data/ckpt/paper_arxiv.ckpt"
+2025-11-14 16:01:12.092 | INFO     | __main__:main:376 - ================= END =================
