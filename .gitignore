@@ -1,2 +1,5 @@
 venv
 DPOSE.sh
+scrach.py
+*.pch
+*.pyc   
