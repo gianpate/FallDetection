@@ -1,24 +1,13 @@
 import numpy as np
 from utils.vectors import angle_between
-
-def get_PoseDirection(joints:dict):
-    head = np.array(joints["head"])
-    rightShoulder = np.array(joints["right_shoulder"])
-    leftShoulder = np.array(joints["left_shoulder"])
-
-    head_left =  leftShoulder - head
-    head_right = rightShoulder - head
-
-    direction = np.cross(head_left, head_right)
-
-    return direction
+from poseProperties import get_PoseDirection
 
 
 
 def directionRecognizer(joints:dict) -> tuple:
     """
     returns true if it doesnt looks straight t[0]
-    degrees from straightus up~+90 and down~-90 t[1]
+    degrees from straight up~+90 and down~-90 t[1]
     """
 
     direction = get_PoseDirection(joints)

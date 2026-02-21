@@ -13,3 +13,7 @@ def angle_between(v1 , v2):
     cos_theta = np.clip(cos_theta, -1.0, 1.0)
 
     return np.arccos(cos_theta)
+
+
+def distance(v1, v2):
+    return np.linalg.norm(v2 - v1)
