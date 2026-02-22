@@ -83,3 +83,10 @@ def get_headToPelvisHeight(joints:dict):
 
 def get_personHeight(joints: dict):
     return get_headToPelvisHeight(joints) + get_legLength(joints)
+
+
+def get_trunckVector(joints:dict):
+    pelvis = np.array(joints["pelvis"])
+    neck = np.array(joints["neck"])
+
+    return neck - pelvis

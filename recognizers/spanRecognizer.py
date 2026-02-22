@@ -2,6 +2,13 @@ import numpy as np
 from utils.vectors import distance
 
 def spanRecognizer(joints:dict) -> tuple:
+    """
+    returns true if horizontal span exceeds vertical span t[0]
+    horizontal span as a percentage of vertical span t[1]:
+        - 100%    equal spans
+        - >100%   wider than tall
+        - <100%   taller than wide
+    """
     
     maxY = max(j[1] for j in joints.values())
     minY = min(j[1] for j in joints.values())
