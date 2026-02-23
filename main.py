@@ -30,7 +30,7 @@ def runFallDetector(detector, samples):
 
 if __name__ == "__main__":
     
-    samples = get_allSamples()
+    samples = get_allSamples(29, 31)
 
     print("conjunction detector \n")
     runFallDetector(fd.conjunctionFallDetector, samples)

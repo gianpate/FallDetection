@@ -23,10 +23,13 @@ def generate_sample_names(start, end, step=1, prefix='sample_', digits=5):
 
 
 
-def get_allSamples():
+def get_allSamples(fall_count, nofall_count):
     """
     returns (fall sample paths, no fall sample paths)
     """
-    fallSamples = [os.path.join("Fall", path) for path in generate_sample_names(1, 14)] 
-    noFallSamples = [os.path.join("NoFall", path) for path in generate_sample_names(1, 8)]
+    fall_dir = "Fall"
+    nofall_dir = "NoFall"
+
+    fallSamples = [os.path.join(fall_dir, path) for path in generate_sample_names(1, fall_count)] 
+    noFallSamples = [os.path.join(nofall_dir, path) for path in generate_sample_names(1, nofall_count)]
     return (fallSamples, noFallSamples)
