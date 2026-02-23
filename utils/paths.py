@@ -20,3 +20,13 @@ def generate_sample_names(start, end, step=1, prefix='sample_', digits=5):
     Returns: list of strings: e.g., ['sample_00001', 'sample_00002', ...]
     """
     return [f"{prefix}{i:0{digits}d}" for i in range(start, end + 1, step)]
+
+
+
+def get_allSamples():
+    """
+    returns (fall sample paths, no fall sample paths)
+    """
+    fallSamples = [os.path.join("Fall", path) for path in generate_sample_names(1, 14)] 
+    noFallSamples = [os.path.join("NoFall", path) for path in generate_sample_names(1, 8)]
+    return (fallSamples, noFallSamples)

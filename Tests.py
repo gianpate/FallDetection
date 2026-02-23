@@ -120,6 +120,6 @@ def runRecognizersTest(recognizers, fallSamples, noFallSamples,
     # Write TXT aligned table
     write_markdown_report(table, recognizers, md_output)
     # Write CSV (Excel friendly)
-    # write_xlsx_report(table, recognizers, xlsx_output)
+    write_xlsx_report(table, recognizers, xlsx_output)
 
     print(f"Reports written to: {md_output} and {xlsx_output}")

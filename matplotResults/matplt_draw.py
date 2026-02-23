@@ -43,7 +43,6 @@ for filename in filenames:
     with open(filename) as f:
 	    data = json.load(f)
 
-
     x = np.array([data[p][0] for p in points])
     y = np.array([data[p][1] for p in points])
     z = np.array([data[p][2] for p in points])

@@ -90,3 +90,13 @@ def get_trunckVector(joints:dict):
     neck = np.array(joints["neck"])
 
     return neck - pelvis
+
+
+
+def get_kneesLevel(joints:dict):
+    rightKnee = np.array(joints["right_knee"])
+    leftKnee = np.array(joints["left_knee"])
+
+    kneesLevel = leftKnee if leftKnee[1] > rightKnee[1] else rightKnee
+
+    return kneesLevel
