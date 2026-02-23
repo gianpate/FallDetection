@@ -342,7 +342,7 @@ def main(args):
             videoFramerate = 30 
             cap = getCaptureDeviceFromPath(args.input,videoWidth,videoHeight,videoFramerate)
 
-            frameNumber = 0
+            frameNumber = args.sample_start
             use_bbox_filter = False
             while True:
                 frameNumber+=1
@@ -467,6 +467,8 @@ if __name__ == '__main__':
     parser.add_argument('--eval_dataset', type=str, default=None)
     parser.add_argument('--dataframe_path', type=str, default='data/ssp_3d_test.npz')
     parser.add_argument('--data_split', type=str, default='test')
+
+    parser.add_argument('--sample_start', type=int, default=0)
 
     args = parser.parse_args()
     main(args)
