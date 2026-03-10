@@ -167,3 +167,86 @@ def runRecognizersTest(recognizers, fallSamples, noFallSamples,
     # write_xlsx_report(table, recognizers, xlsx_output)
 
     print(f"Reports written to: {md_output} and {xlsx_output}")
+
+
+
+
+def write_markdown_detector_report(table, detectors, filename):
+    """
+    Writes a markdown report for boolean-only detectors.
+    table: list of rows, each row = [sample, expected, det1_result, det2_result, ...]
+    detectors: list of detector functions
+    """
+    stats = []
+    for d_index in range(len(detectors)):
+        TP = FP = TN = FN = 0
+        for row in table:
+            expected = row[1]
+            detected = row[d_index + 2]  # +2 because index 0=sample, 1=expected
+            if detected and expected:
+                TP += 1
+            elif detected and not expected:
+                FP += 1
+            elif not detected and not expected:
+                TN += 1
+            else:
+                FN += 1
+        stats.append((TP, FP, TN, FN))
+
+    with open(filename, "w") as f:
+        # Summary table
+        f.write("## Detector Summary\n\n")
+        header = ["Detector", "TP", "FP", "TN", "FN"]
+        separator = [":--", "--:", "--:", "--:", "--:"]
+        f.write("| " + " | ".join(header) + " |\n")
+        f.write("| " + " | ".join(separator) + " |\n")
+        for det, (TP, FP, TN, FN) in zip(detectors, stats):
+            f.write(f"| {det.__name__} | {TP} | {FP} | {TN} | {FN} |\n")
+        f.write("\n\n")
+
+        # Detailed table
+        detail_header = ["SAMPLE"] + [det.__name__ for det in detectors]
+        detail_separator = [":--"] + [":--" for _ in detectors]
+        f.write("| " + " | ".join(detail_header) + " |\n")
+        f.write("| " + " | ".join(detail_separator) + " |\n")
+
+        for row in table:
+            sample = row[0]
+            expected = row[1]
+            md_row = [sample]
+            for detected in row[2:]:
+                status = "🟢 PASS" if detected == expected else "🔴 FAIL"
+                md_row.append(status)
+            f.write("| " + " | ".join(md_row) + " |\n")
+
+
+def run_FallDetectorsTest(detectors, fallSamples, noFallSamples,
+                          md_output="testResults/fallDetectorsResults.md",
+                          xlsx_output="testResults/fallDetectorsResults.xlsx"):
+    """
+    Tests a list of boolean‑only fall detectors on positive (fall) and negative (no fall) samples.
+    Generates markdown and Excel reports with PASS/FAIL and confusion matrix statistics.
+    """
+    # Build unified sample list with ground truth
+    samples = []
+    for sample in fallSamples:
+        samples.append((sample, True))   # fall expected
+    for sample in noFallSamples:
+        samples.append((sample, False))  # no fall expected
+
+    # Collect structured results
+    # table entry: [sample_name, expected, det1_result, det2_result, ...]
+    table = []
+    for sample, expected in samples:
+        joints = basicParser(sample)          # assumes this function returns joint data
+        row = [sample, expected]
+        for det in detectors:
+            detected = det(joints)             # detector returns bool only
+            row.append(detected)
+        table.append(row)
+
+    # Write reports
+    write_markdown_detector_report(table, detectors, md_output)
+    # write_xlsx_detector_report(table, detectors, xlsx_output)
+
+    print(f"Reports written to: {md_output} and {xlsx_output}")

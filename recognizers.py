@@ -149,7 +149,7 @@ def kneesDownRecognizer(joints:dict) -> tuple:
     """
     returns true if knees are lower than ~80% of shin height above feet t[0]
     how high knees are relative to shin length t[1]:
-        - 100%    knees at hip level
+        - 100%    knees straight up
         - 0%      knees at feet level
         - <0%     knees below feet
     """

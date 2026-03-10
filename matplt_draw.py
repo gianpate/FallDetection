@@ -3,7 +3,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import json, os
 import numpy as np
 
-filenames = [f"samples/results/skeleton_0000{i}.json" for i in range(1, 9)]
+# filenames = [f"samples/results/skeleton_0000{i}.json" for i in range(1, 9)]
+filenames = ["samples/Fall/sample_00027/skeleton.json"]
 
 points = [
     "pelvis", "spine1", "spine2", "spine3", "neck",
@@ -48,7 +49,7 @@ for filename in filenames:
     z = np.array([data[p][2] for p in points])
 
     base_name = os.path.splitext(os.path.basename(filename))[0]
-    output_dir = os.path.join("samples/matplots", base_name)
+    output_dir = os.path.join(".", base_name)
     os.makedirs(output_dir, exist_ok=True)
 
     for i, (elev, azim) in enumerate(views):
