@@ -7,25 +7,63 @@ from openpyxl.styles import Font
 
 
 def write_markdown_report(table, recognizers, filename):
-    # Build header rows
-    header = ["SAMPLE"]
-    for recog in recognizers:
-        name = recog.__name__
-        header.append(f"{name} SCORE")
-        header.append(f"{name} PASS")
 
+    stats = []
 
-    #  Build separator row (alignment row)
-    #    Left for SAMPLE and PASS
-    #    Right for SCORE
+    for r_index in range(len(recognizers)):
+        TP = FP = TN = FN = 0
 
-    separator = [":--"]  # SAMPLE left aligned
-    for _ in recognizers:
-        separator.append("--:")   # SCORE right
-        separator.append(":--")   # PASS left
+        for row in table:
+            expected = row[1]
+            detected = row[r_index + 2][0]  # +2 because:
+                                            # 0 = sample
+                                            # 1 = expected
+
+            if detected and expected:
+                TP += 1
+            elif detected and not expected:
+                FP += 1
+            elif not detected and not expected:
+                TN += 1
+            else:
+                FN += 1
+
+        stats.append((TP, FP, TN, FN))
+
 
     #  Write file
     with open(filename, "w") as f:
+        f.write("## Recognizer Summary\n\n")
+
+        summary_header = ["Recognizer", "TP", "FP", "TN", "FN"]
+        summary_separator = [":--", "--:", "--:", "--:", "--:"]
+
+        f.write("| " + " | ".join(summary_header) + " |\n")
+        f.write("| " + " | ".join(summary_separator) + " |\n")
+
+        for recog, (TP, FP, TN, FN) in zip(recognizers, stats):
+            f.write(f"| {recog.__name__} | {TP} | {FP} | {TN} | {FN} |\n")
+
+        f.write("\n\n")
+
+
+        # Build header rows
+        header = ["SAMPLE"]
+        for recog in recognizers:
+            name = recog.__name__
+            header.append(f"{name} SCORE")
+            header.append(f"{name} PASS")
+
+
+        #  Build separator row (alignment row)
+        #    Left for SAMPLE and PASS
+        #    Right for SCORE
+
+        separator = [":--"]  # SAMPLE left aligned
+        for _ in recognizers:
+            separator.append("--:")   # SCORE right
+            separator.append(":--")   # PASS left
+
         # First header row
         f.write("| " + " | ".join(header) + " |\n")
         # Alignment separator
@@ -33,11 +71,16 @@ def write_markdown_report(table, recognizers, filename):
  
         # Data rows
         for row in table:
-            md_row = [row[0]]
-            for (p, s) in row[1:]:
-                status = "🟢 PASS" if p else "🔴 FAIL"
-                md_row.append(f"{s:.1f}")
+            sample = row[0]
+            expected = row[1]
+
+            md_row = [sample]
+
+            for (detected, score) in row[2:]:
+                status = "🟢 PASS" if detected == expected else "🔴 FAIL"
+                md_row.append(f"{score:.1f}")
                 md_row.append(status)
+
             f.write("| " + " | ".join(md_row) + " |\n")
 
 
@@ -109,17 +152,18 @@ def runRecognizersTest(recognizers, fallSamples, noFallSamples,
     table = []
     for sample, expected in samples:
         joints = basicParser(sample)
-        row = [sample]
+
+        row = [sample, expected] 
+    
         for recog in recognizers:
             detected, score = recog(joints)
-            test_pass = detected == expected
-            row.append((test_pass, score))
+            row.append((detected, score))
         table.append(row)
 
 
     # Write TXT aligned table
     write_markdown_report(table, recognizers, md_output)
     # Write CSV (Excel friendly)
-    write_xlsx_report(table, recognizers, xlsx_output)
+    # write_xlsx_report(table, recognizers, xlsx_output)
 
     print(f"Reports written to: {md_output} and {xlsx_output}")

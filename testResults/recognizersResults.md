@@ -1,3 +1,15 @@
+## Recognizer Summary
+
+| Recognizer | TP | FP | TN | FN |
+| :-- | --: | --: | --: | --: |
+| directionRecognizer | 21 | 9 | 22 | 8 |
+| pelvisDownRecognizer | 27 | 14 | 17 | 2 |
+| handsDownRecognizer | 27 | 17 | 14 | 2 |
+| spanRecognizer | 25 | 9 | 22 | 4 |
+| trunkAngleRecognizer | 22 | 12 | 19 | 7 |
+| kneesDownRecognizer | 28 | 20 | 11 | 1 |
+
+
 | SAMPLE | directionRecognizer SCORE | directionRecognizer PASS | pelvisDownRecognizer SCORE | pelvisDownRecognizer PASS | handsDownRecognizer SCORE | handsDownRecognizer PASS | spanRecognizer SCORE | spanRecognizer PASS | trunkAngleRecognizer SCORE | trunkAngleRecognizer PASS | kneesDownRecognizer SCORE | kneesDownRecognizer PASS |
 | :-- | --: | :-- | --: | :-- | --: | :-- | --: | :-- | --: | :-- | --: | :-- |
 | Fall/sample_00001 | 29.7 | 🔴 FAIL | 51.9 | 🟢 PASS | 73.9 | 🟢 PASS | 206.5 | 🟢 PASS | 54.4 | 🟢 PASS | 46.0 | 🟢 PASS |
