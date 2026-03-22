@@ -1,3 +1,4 @@
-from .conjunctionFallDetector import simpleConjunctionFallDetector
+from .conjunctionFallDetector import conjunctionFallDetector
 from .weightedFallDetector import weightedFallDetector
+from .combinationFallDetector.combinationFallDetector import combinationFallDetector
 

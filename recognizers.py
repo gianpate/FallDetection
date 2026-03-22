@@ -3,6 +3,25 @@ from utils.vectors import angle_between, distance
 import poseProperties as ps
 
 
+def get_recognizers():
+    """
+    Return a list of all recognizer functions defined in this module.
+    Recognizer functions are those whose names end with 'Recognizer'
+    and are defined directly in this module (not imported)
+    """
+    import inspect
+    import sys
+    module = sys.modules[__name__]
+    recognizers = []
+    for name, obj in inspect.getmembers(module):
+        # Only take functions defined in this module, ending with 'Recognizer'
+        if (name.endswith('Recognizer') and 
+            inspect.isfunction(obj) and 
+            obj.__module__ == __name__):
+            recognizers.append(obj)
+    return recognizers
+
+
 
 def directionRecognizer(joints:dict) -> tuple:
     """

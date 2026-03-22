@@ -33,6 +33,9 @@ if __name__ == "__main__":
     samples = get_allSamples(29, 31)
 
     print("conjunction detector \n")
-    runFallDetector(fd.simpleConjunctionFallDetector ,samples)
+    runFallDetector(fd.conjunctionFallDetector ,samples)
     print("\n weighted score detector")
     runFallDetector(fd.weightedFallDetector, samples)
+    print("\n combinations detector")
+    runFallDetector(fd.combinationFallDetector, samples)
+

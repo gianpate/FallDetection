@@ -1,7 +1,7 @@
 import recognizers as rec
 
 
-def simpleConjunctionFallDetector(joints:dict) -> bool:
+def conjunctionFallDetector(joints:dict) -> bool:
     """
     if horizontal span negative => definately NoFall
     if positive => span && pelvisDown => pelvisDown
