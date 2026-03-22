@@ -33,3 +33,18 @@ def get_allSamples(fall_count, nofall_count):
     fallSamples = [os.path.join(fall_dir, path) for path in generate_sample_names(1, fall_count)] 
     noFallSamples = [os.path.join(nofall_dir, path) for path in generate_sample_names(1, nofall_count)]
     return (fallSamples, noFallSamples)
+
+
+
+def get_flagged_samples():
+    FALLS = 29
+    NO_FALLS = 31
+
+    fallSamples, noFallSamples = get_allSamples(FALLS, NO_FALLS)
+    samples = []
+    for sample in fallSamples:
+        samples.append((sample, True))   # fall expected
+    for sample in noFallSamples:
+        samples.append((sample, False))  # no fall expected
+
+    return samples
