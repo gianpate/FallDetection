@@ -1,6 +1,11 @@
 import numpy as np
 from utils.vectors import distance
 
+
+#  levels of two points a.k.a. left,right knees or hands etc, 
+#  are defined as the minimum height of the two involved points
+
+
 def get_PoseDirection(joints:dict):
     head = np.array(joints["head"])
     rightShoulder = np.array(joints["right_shoulder"])
@@ -41,6 +46,17 @@ def get_shinLength(joints:dict):
 
     return (leftShin + rightShin) / 2.0
 
+
+def get_thighLength(joints:dict):
+    leftHip = np.array(joints["left_hip"])
+    leftKnee = np.array(joints["left_knee"])
+    leftThigh = distance(leftHip, leftKnee)
+
+    rightHip = np.array(joints["right_hip"])
+    rightKnee = np.array(joints["right_knee"])
+    rightThigh = distance(rightHip, rightKnee)
+
+    return (leftThigh + rightThigh) / 2.0
 
 
 def get_feetLevel(joints):
@@ -90,7 +106,6 @@ def get_trunckVector(joints:dict):
     neck = np.array(joints["neck"])
 
     return neck - pelvis
-
 
 
 def get_kneesLevel(joints:dict):

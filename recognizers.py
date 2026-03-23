@@ -1,9 +1,24 @@
+"""
+Recognizers for fall detection.
+
+recognizer(joints:dict) -> (bool, float)
+
+    - `bool` : `True` if the recognizer detects the characteristic/fall, `False` otherwise.
+    - `float`: a continuous value-index related to the recognized characteristic
+
+Recognizer functions follow the naming pattern `*Recognizer`. The module
+provides a function `get_recognizers()` that returns a list of all such
+functions defined in this module.
+"""
+
+
+
 import numpy as np
 from utils.vectors import angle_between, distance
 import poseProperties as ps
 
 
-def get_recognizers():
+def get_recognizers() -> list:
     """
     Return a list of all recognizer functions defined in this module.
     Recognizer functions are those whose names end with 'Recognizer'
@@ -191,5 +206,67 @@ def kneesDownRecognizer(joints:dict) -> tuple:
 
 
 
-# next:  recognizer that takes pelvis and knees into acount
+def headDownRecognizer(joints:dict) -> tuple:
+    """
+    returns true if head is lower than the height of the back t[0]
+    how low the head is relative to the back height t[1]:
+        - >100%   head above threshold (safe upright posture)
+        - 100%    head exactly at threshold
+        - 0%      head at feet level
+        - <0%     head below feet
+    """
+    head = np.array(joints["head"])
+    head_Y = head[1]
+
+    feetLevel = ps.get_feetLevel(joints)
+    feet_Y = feetLevel[1]
+
+    backHeight = ps.get_headToPelvisHeight(joints)
+
+    #  -y => up so we subtract
+    headHeightLimit = feet_Y - backHeight
+
+    fall = head_Y > headHeightLimit
+
+    heightOfHead = (feet_Y - head_Y) / backHeight * 100
+
+    return (fall, heightOfHead)
+
+
+
+
+def pelvisBelowKneesRecognizer(joints:dict) -> tuple:
+    """
+    returns true if pelvis is lower than 80% of thigh height above knees t[0]
+    how high the pelvis is relative to the knees normalized by thigh length t[1]:
+        - >80%   pelvis above threshold (safe upright posture)
+        - 80%    pelvis exactly at threshold
+        - 0%     pelvis at knee level
+        - <0%    pelvis below knees
+    """
+    pelvis = np.array(joints["pelvis"])
+    pelvis_Y = pelvis[1]
+
+    kneesLevel = ps.get_kneesLevel(joints)
+    knees_Y = kneesLevel[1]
+
+    thigh = ps.get_thighLength(joints)
+
+    #  -y => up so we subtract
+    pelvisHeightLimit = knees_Y - thigh * 0.8
+
+    fall = pelvis_Y > pelvisHeightLimit
+
+    heightDiffofPelvis = (knees_Y - pelvis_Y) / thigh * 100
+
+    return (fall, heightDiffofPelvis)
+
+
+
+
+
+
+
+
+
 

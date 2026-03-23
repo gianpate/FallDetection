@@ -37,6 +37,9 @@ def get_allSamples(fall_count, nofall_count):
 
 
 def get_flagged_samples():
+    """
+    returns list pf tuples (samplename, flag)
+    """
     FALLS = 29
     NO_FALLS = 31
 
