@@ -12,7 +12,6 @@ functions defined in this module.
 """
 
 
-
 import numpy as np
 from utils.vectors import angle_between, distance
 import poseProperties as ps
