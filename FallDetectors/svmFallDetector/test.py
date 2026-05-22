@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.svm import SVC 
-from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.model_selection import cross_val_score, StratifiedKFold, GridSearchCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -11,12 +11,43 @@ from sklearn.preprocessing import StandardScaler
 # , c, gamma, kernel, and degree for polynom
 
 def fetch_samples_and_lables(dataCSV):
-    df = pd.read_csv(dataCSV)
-
-    x = df.drop(columns=['sample_name', 'expected'])  # recognizer columns
-    y = df['expected']                                # target labels
-
-    return x, y
+    """
+    Reads one or more CSV files
+    
+    data_path: either a path to a single CSV file, or a directory
+                containing multiple CSV files (all with same columns).
+    
+    Returns:
+        X: DataFrame with recognizer columns (all except 'sample_name' and 'expected')
+        y: Series with 'expected' labels
+    """
+    csv_files = []
+    if os.path.isfile(dataCSV) and dataCSV.endswith('.csv'):
+        csv_files = [dataCSV]
+    elif os.path.isdir(dataCSV):
+        for f in os.listdir(dataCSV):
+            if f.endswith('.csv'):
+                csv_files.append(os.path.join(dataCSV, f))
+    else:
+        raise ValueError(f"Invalid path: {dataCSV} (must be .csv file or directory)")
+    
+    if not csv_files:
+        raise ValueError(f"No CSV files found in {dataCSV}")
+    
+    # Read and concatenate
+    dfs = []
+    for csv_file in csv_files:
+        print(f"fetching: {csv_file}")
+        df = pd.read_csv(csv_file)
+        dfs.append(df)
+    
+    combined_df = pd.concat(dfs, ignore_index=True)
+    
+    # Separate features and target
+    X = combined_df.drop(columns=['sample_name', 'expected'])
+    y = combined_df['expected']
+    
+    return X, y
 
     
 
@@ -52,7 +83,7 @@ def plot_comparison_simple(scores_noStandardization, scores_Standardization, sav
     plt.ylabel('Accuracy')
     plt.title('SVM: Scaling vs No Scaling')
     plt.xticks(folds)
-    plt.ylim(0, 1)
+    plt.ylim(0.8, 1)
     plt.legend()
     plt.grid(axis='y', alpha=0.3)
     if save_path:
@@ -69,7 +100,7 @@ def test_standardization_on_kernels(x, y, skf):
     Test all kernels with and without standardization.
     """
     
-    kernels = ['linear', 'rbf', 'poly', 'sigmoid']
+    kernels = ["linear", "rbf", "poly", "sigmoid"]
     results = {}
     
     for kernel in kernels:
@@ -120,7 +151,7 @@ def plot_kernel_std_comparison(results, save_path=None):
     ax.set_title('SVM Performance: Standardization Effect Across Kernels')
     ax.set_xticks(x)
     ax.set_xticklabels(kernels)
-    ax.set_ylim(0, 1)
+    ax.set_ylim(0.8, 1)
     ax.legend()
     ax.grid(axis='y', alpha=0.3)
 
@@ -201,7 +232,7 @@ def plot_tuning_results(results, param_name, save_path=None):
     plt.title(f'Tuning {param_name}')
     plt.grid(True, alpha=0.3)
     plt.legend()
-    plt.ylim(0, 1)
+    # plt.ylim(0, 1)
     
     if save_path:
         plt.savefig(os.path.join(save_path, f"test_{param_name}.jpg"), dpi=300, bbox_inches='tight')
@@ -215,23 +246,90 @@ def plot_tuning_results(results, param_name, save_path=None):
 
 def runTest(dataCSV, save_path=None):
     x, y = fetch_samples_and_lables(dataCSV)
+    print("fetch complete")
     
     #cross validation spliter
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-    # scores = teststardardization(x, y, skf)
-    # plot_comparison_simple(scores[0], scores[1], save_path)
+    scores = teststardardization(x, y, skf)
+    # ======================================================================================================================
+    print("Standardization (RBF kernel):")
+    print(f"  Without scaling: mean={np.mean(scores[0]):.4f} ± std={np.std(scores[0]):.4f}")
+    print(f"  With scaling:    mean={np.mean(scores[1]):.4f} ± std={np.std(scores[1]):.4f}")
+    # ======================================================================================================================
+    plot_comparison_simple(scores[0], scores[1], save_path)
 
-    # r = test_standardization_on_kernels(x, y, skf)
-    # plot_kernel_std_comparison(r, save_path)
+
+
+    r = test_standardization_on_kernels(x, y, skf)
+    # ======================================================================================================================
+    print("\nStandardization across kernels:")
+    for kernel, m in r.items():
+        print(f"  {kernel}: no scaling={m['no_std_mean']:.4f} ± {m['no_std_std']:.4f} | scaling={m['std_mean']:.4f} ± {m['std_std']:.4f}")
+    # ======================================================================================================================
+    plot_kernel_std_comparison(r, save_path)
+
+
 
     kernels = ['linear', 'rbf', 'poly', 'sigmoid']
     c_values = [0.1, 1, 10, 100]
     r = test_c(x, y, skf, kernels, c_values)
+    # ======================================================================================================================
+    print("\nTuning C (with scaling):")
+    for kernel in kernels:
+        best_c = max(r[kernel], key=r[kernel].get)
+        best_score = r[kernel][best_c]
+        print(f"  {kernel}: best C={best_c} -> accuracy={best_score:.4f}")
+    # ======================================================================================================================
     plot_tuning_results(r, "C", save_path)
 
     
+
     kernels = ['rbf', 'poly', 'sigmoid']
     gamma_values = ['scale', 'auto', 0.1, 1, 10]
     r = test_gamma(x, y, skf, kernels, gamma_values)
+    # ======================================================================================================================
+    print("\nTuning gamma (with scaling):")
+    for kernel in kernels:
+        best_g = max(r[kernel], key=r[kernel].get)
+        best_score = r[kernel][best_g]
+        print(f"  {kernel}: best gamma={best_g} -> accuracy={best_score:.4f}")
+    # ======================================================================================================================
     plot_tuning_results(r, "gamma", save_path)
+
+
+
+def find_optimal_params(dataCSV, save_path=None):
+    print("\ngrid search for best C and gamma (RBF kernel)...")
+    
+    x, y = fetch_samples_and_lables(dataCSV)
+    print("fetch complete")
+    
+    param_grid = {
+        'svc__C': [0.1, 1, 10, 100],
+        'svc__gamma': ['scale', 'auto', 0.1, 1, 10]
+    }
+    pipeline = make_pipeline(StandardScaler(), SVC(kernel='rbf'))
+    cv = StratifiedKFold(5, shuffle=True, random_state=42)
+    grid = GridSearchCV(pipeline, param_grid, cv=cv, scoring='accuracy', n_jobs=-1)
+    grid.fit(x, y)
+    
+    print(f"Best parameters: {grid.best_params_}")
+    print(f"Best cross‑validation accuracy: {grid.best_score_:.4f}")
+    
+    # Optional: save a heatmap of the grid search results
+    if save_path:
+        import seaborn as sns
+        scores = grid.cv_results_['mean_test_score'].reshape(len(param_grid['svc__C']), len(param_grid['svc__gamma']))
+        plt.figure(figsize=(8,6))
+        sns.heatmap(scores, 
+                    xticklabels=param_grid['svc__gamma'], 
+                    yticklabels=param_grid['svc__C'],
+                    annot=True, fmt='.3f', cmap='viridis')
+        plt.xlabel('gamma')
+        plt.ylabel('C')
+        plt.title('Grid Search Accuracy (RBF kernel)')
+        plt.savefig(os.path.join(save_path, 'optimal_params_heatmap.jpg'), dpi=300, bbox_inches='tight')
+        plt.close()
+    
+    return grid.best_params_, grid.best_score_

@@ -33,5 +33,11 @@ def basicParser(inputDirectory, samplesDir="samples"):
     filtered = filter_joints(data, BASIC_points)
     return filtered
 
-    
+
+def directBasicParser(jsonFile):
+    with open(jsonFile, 'r') as f:
+        data = json.load(f)
+
+    filtered = filter_joints(data, BASIC_points)
+    return filtered
 

@@ -4,3 +4,5 @@ scrach.py
 *.pch
 *.pyc   
 scrach
+Datasets
+data/

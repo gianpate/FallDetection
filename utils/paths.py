@@ -1,5 +1,7 @@
 
 import os
+import re
+import csv
 
 def skeletonJson_path(directory):
     """
@@ -38,7 +40,7 @@ def get_allSamples(fall_count, nofall_count):
 
 def get_flagged_samples():
     """
-    returns list pf tuples (samplename, flag)
+    returns list of tuples (samplename, flag)
     """
     FALLS = 29
     NO_FALLS = 31
@@ -51,3 +53,48 @@ def get_flagged_samples():
         samples.append((sample, False))  # no fall expected
 
     return samples
+
+
+
+def get_video_paths_URFD(dataset_base):
+    """
+    Returns a sorted list of paths to video directories
+    Each directory name should match 'adl-XX' or 'fall-XX'
+    """
+    videos = []
+    for entry in os.listdir(dataset_base):
+        full_path = os.path.join(dataset_base, entry)
+        if os.path.isdir(full_path) and re.match(r'(adl|fall)-\d+', entry):
+            videos.append(full_path)
+    return sorted(videos)
+
+
+def get_labeled_dataset_URFD(base_dir):
+    """
+    Returns a dictionary: {video_name: [(frame_path, label), ...], ...}
+    """
+    # get the list of video directories (to know which videos exist)
+    video_paths = get_video_paths_URFD(base_dir)
+    result = {}
+
+    for csv_name in ['adls.csv', 'falls.csv']:
+        csv_path = os.path.join(base_dir, csv_name)
+        
+        with open(csv_path, 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                video_name = row[0].strip()
+                frame_num = int(row[1])
+                label = int(row[2])
+
+                # Construct the expected frame file path
+                frame_file = f"frame_{frame_num:03d}.json"
+                frame_path = os.path.join(base_dir, video_name, frame_file)
+
+                # Only add if the file actually exists (this automatically skips even frame numbers)
+                if os.path.exists(frame_path):
+                    if video_name not in result:
+                        result[video_name] = []
+                    result[video_name].append((frame_path, label))
+
+    return result
